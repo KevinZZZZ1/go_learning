@@ -13,4 +13,13 @@ func main() {
 	distance = 4000000
 	fmt.Println(distance/lightSpeed, "seconds")
 
+	var (
+		distance = 56000000
+		speed    = 100800
+	)
+
+	var distance, speed = 56000000, 100800
+
+	const hoursPerDay, minutesPerHour = 24, 60
+
 }
