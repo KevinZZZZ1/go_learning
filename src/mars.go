@@ -10,7 +10,9 @@ type kelvin float64
 
 func main() {
 
-	fmt.Println("Hello, World")
+	var tmp celsius = 25
+
+	fmt.Printf("%v celsius is %v in form of fahrenheit and also %v in form of kelvin", tmp, tmp.toFahrenheit(), tmp.toKelvin())
 
 }
 
