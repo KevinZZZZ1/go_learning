@@ -12,4 +12,15 @@ func main() {
 
 	f()
 
+	// 匿名函数
+	d := func(message string) {
+		fmt.Println(message)
+	}
+	d("Go to the party")
+
+	// 声明完匿名函数后立即执行
+	func() {
+		fmt.Println("Functions anonymous")
+	}()
+
 }
