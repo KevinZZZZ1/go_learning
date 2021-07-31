@@ -21,4 +21,10 @@ func main() {
 
 	moon := temperature["Moon"]
 	fmt.Println(moon)
+
+	if moon, ok := temperature["Moon"]; ok {
+		fmt.Printf("On average the moon is %v .\n", moon)
+	} else {
+		fmt.Println("Where is the moon?")
+	}
 }
