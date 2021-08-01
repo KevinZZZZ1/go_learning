@@ -1,20 +1,55 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func main() {
 
-	// 指针是指向另一个变量地址的变量
+	var administrator *string
 
-	// &表示地址操作符，通过&可以获得变量的内存地址
-	// *和&的作用相反，是用来解引用的，表示得到内存地址指向的值
+	scolese := "Christopher J. Scolese"
+	administrator = &scolese
+	fmt.Println(*administrator)
+	// 输出Christopher J. Scolese
 
-	var answer int32 = 42
-	fmt.Println(&answer)
+	bolden := "Charles F. Bolden"
+	administrator = &bolden
+	fmt.Println(*administrator)
+	// 输出Charles F. Bolden
 
-	// 定义一个指向int32类型的指针，*放在变量前面表示解引用操作，放在类型前面表示指针类型
-	var address *int32 = &answer
-	fmt.Printf("%T\n", address)
-	fmt.Println(*address)
+	bolden = "Charles Frank Bolden Jr."
+	fmt.Println(*administrator)
+	// 输出Charles Frank Bolden Jr.
 
+	*administrator = "Maj. Gen. Charles Frank Bolden Jr."
+	fmt.Println(bolden)
+	// 输出Maj. Gen. Charles Frank Bolden Jr.
+
+	major := administrator
+	*major = "Major General Charles Frank Bolden Jr."
+	fmt.Println(bolden)
+	// 输出Major General Charles Frank Bolden Jr.
+
+	// 如果两个指针类型的变量中存储的地址是一样的，它们的比较就是true
+	fmt.Println(administrator == major)
+	// 输出true
+
+	lightfoot := "Robert M. Lightfoot Jr."
+	administrator = &lightfoot
+	fmt.Println(administrator == major)
+	// 输出false
+
+	charles := *major
+	*major = "Charles Bolden"
+	fmt.Println(charles)
+	// 输出Major General Charles Frank Bolden Jr.
+	fmt.Println(bolden)
+	// 输出Charles Bolden
+
+	charles = "Charles Bolden"
+	fmt.Println(charles == bolden)
+	// 输出true
+	fmt.Println(&charles == &bolden)
+	// 输出false
 }
