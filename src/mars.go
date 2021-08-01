@@ -2,25 +2,63 @@ package main
 
 import "fmt"
 
-func reclassify(planets *[]string) {
-	*planets = (*planets)[0:8]
+type person struct {
+	age int
+}
+
+func (p *person) birthday() {
+	if p == nil {
+		return
+	}
+	p.age++
 }
 
 func main() {
-	// map在赋值或被作为参数传递给函数（方法）的时候不会被复制，而是以指针的形式传递
+	// go中nil表示“无”或“零”，是一个零值
+	// 指针，slice，map，函数类型变量和接口的零值都是nil
+	// 尝试解引用一个nil的指针会导致panic
+	var nobody *person
+	fmt.Println(nobody)
 
-	// slice在指向数组元素的时候也使用了指针
-	// 每个slice内部都会被表示为一个包括3个元素的结构：
-	// 	数组的指针
-	//	slice容量
-	// 	slice长度
-	// slice被直接传递给方法（函数）时，slice内部的指针就可以对底层的数组进行操作
-	planets := []string{
-		"Mercury", "Venus", "Earth", "Mars",
-		"Jupiter", "Saturn", "Uranus", "Neptune",
-		"Pluto",
+	// 如果p是nil的话，在给p解引用的时候才会panic，所以单纯调用nobody.birthday()并不是panic
+	nobody.birthday()
+
+	var fn func(a, b int) int
+	fmt.Println(fn == nil)
+
+	// range len() append()可以正确处理nil的slice和map
+	var soup []string
+
+	for _, ingredient := range soup {
+		fmt.Println(ingredient)
 	}
 
-	reclassify(&planets)
-	fmt.Println(planets)
+	fmt.Println(len(soup))
+
+	soup = append(soup, "onion", "carrot")
+	fmt.Println(soup)
+
+	var soups map[string]int
+	fmt.Println(soup == nil)
+
+	mesurement, ok := soups["onion"]
+	if ok {
+		fmt.Println(mesurement)
+	}
+
+	for ingredient, mesurement := range soups {
+		fmt.Println(ingredient, mesurement)
+	}
+
+	// 未被赋值的接口变量，其接口类型和值都是nil，变量本身也是nil
+	// 只有当类型和值都是nil的时候，接口变量才等于nil
+	var test interface{}
+	// 分别打印出类型，值，是否等于nil
+	fmt.Printf("%T, %v %v\n", test, test, test == nil)
+	var p *int
+	test = p
+	fmt.Printf("%T, %v %v\n", test, test, test == nil)
+	// 输出接口变量的内部表示
+	fmt.Printf("%#v\n", test)
+
 }
