@@ -1,67 +1,38 @@
 package main
 
-import (
-	"encoding/json"
-	"fmt"
-	"os"
-)
+import "fmt"
 
-type location struct {
-	Name string
-	Lat  float64
-	Long float64
+type coordinate struct {
+	d, m, s float64
+	h       rune
+}
+
+// go中没有Java中的构造方法，但是可以用一个函数用来构造struct，这样就能让我们在创建struct的时候同步做些其他的事情
+func newCoordinate() coordinate {
+	return coordinate{}
 }
 
 func main() {
 
-	// 声明一个struct slice
-	var locations []location = []location{
-		{Name: "Bradbury Landing", Lat: -4.5895, Long: 175.4513541},
-		{Name: "Columbia Memorial Station", Lat: -14.4551, Long: 137.41654},
-		{Name: "Challenger Memorial Statition", Lat: -1.34265, Long: 354.454},
-	}
+	// go中没有class，对象，继承
+	// 我们可以通过struct和方法实现面向对象，即我们可以使用方法关联到类型的方式实现
 
-	fmt.Println(locations)
+	lat := coordinate{4, 35, 22.2, 'S'}
 
-	// struct格式化为json
-	var curiosity location = location{
-		Lat:  -4.2151,
-		Long: 137.4121,
-		Name: "ceeeeb",
-	}
+	long := coordinate{137, 26, 30.12, 'E'}
 
-	// 使用Marshal函数时要求struct中的字段都是大写开头的，即可以导出的
-	// 如果是不可以导出的，将会输出{}
-	bytes, err := json.Marshal(curiosity)
+	coor := newCoordinate()
 
-	exitOnError(err)
-
-	fmt.Println(string(bytes))
-
-	// 如果想自定义json输出的字段key的话，可以使用struct标签来自定义
-	type people struct {
-		Name    string `json:"user_name"`
-		Age     int    `json:"user_age"`
-		Address string `json:"user_addr"`
-	}
-
-	var user people = people{
-		Name:    "kvein",
-		Age:     30,
-		Address: "USA",
-	}
-
-	bytes, err = json.Marshal(user)
-
-	exitOnError(err)
-
-	fmt.Println(string(bytes))
+	fmt.Println(lat.decimal(), long.decimal(), coor.decimal())
 
 }
 
-func exitOnError(err error) {
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+func (c coordinate) decimal() float64 {
+	var sign float64 = 1
+	switch c.h {
+	case 'S', 's', 'E', 'e':
+		sign = -1
 	}
+
+	return sign * (c.d + c.m/60 + c.s/3600)
 }
