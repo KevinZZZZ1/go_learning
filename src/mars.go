@@ -1,64 +1,50 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"io/ioutil"
+	"os"
+)
 
-type person struct {
-	age int
-}
+func proverbs(name string) error {
+	f, err := os.Create(name)
 
-func (p *person) birthday() {
-	if p == nil {
-		return
+	if err != nil {
+		return err
 	}
-	p.age++
+
+	// defer表示延迟执行，会在函数返回之前执行
+	// defer可以作用于任何函数或方法
+	defer f.Close()
+
+	_, err = fmt.Fprintln(f, "Errors are values.")
+	if err != nil {
+		return err
+	}
+
+	_, err = fmt.Fprintln(f, "Don't just check errors, handle them gracefully")
+	return err
+
 }
 
 func main() {
-	// go中nil表示“无”或“零”，是一个零值
-	// 指针，slice，map，函数类型变量和接口的零值都是nil
-	// 尝试解引用一个nil的指针会导致panic
-	var nobody *person
-	fmt.Println(nobody)
+	// go允许函数和方法返回多个值，而且按照惯例，返回的最后一个值表示错误
+	// 在调用函数之后应该立即检查是否发生错误，而且在错误发生的时候函数返回的其他值就不可信了
 
-	// 如果p是nil的话，在给p解引用的时候才会panic，所以单纯调用nobody.birthday()并不是panic
-	nobody.birthday()
-
-	var fn func(a, b int) int
-	fmt.Println(fn == nil)
-
-	// range len() append()可以正确处理nil的slice和map
-	var soup []string
-
-	for _, ingredient := range soup {
-		fmt.Println(ingredient)
+	files, err := ioutil.ReadDir(".")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
 
-	fmt.Println(len(soup))
-
-	soup = append(soup, "onion", "carrot")
-	fmt.Println(soup)
-
-	var soups map[string]int
-	fmt.Println(soup == nil)
-
-	mesurement, ok := soups["onion"]
-	if ok {
-		fmt.Println(mesurement)
+	for _, file := range files {
+		fmt.Println(file.Name())
 	}
 
-	for ingredient, mesurement := range soups {
-		fmt.Println(ingredient, mesurement)
-	}
-
-	// 未被赋值的接口变量，其接口类型和值都是nil，变量本身也是nil
-	// 只有当类型和值都是nil的时候，接口变量才等于nil
-	var test interface{}
-	// 分别打印出类型，值，是否等于nil
-	fmt.Printf("%T, %v %v\n", test, test, test == nil)
-	var p *int
-	test = p
-	fmt.Printf("%T, %v %v\n", test, test, test == nil)
-	// 输出接口变量的内部表示
-	fmt.Printf("%#v\n", test)
+	defer func() {
+		if e := recover(); e != nil {
+			fmt.Println(e)
+		}
+	}()
 
 }
