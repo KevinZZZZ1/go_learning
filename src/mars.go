@@ -1,55 +1,32 @@
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
+
+type person struct {
+	name, superpower string
+	age              int
+}
 
 func main() {
+	// 复合字面量的前面可以使用&
 
-	var administrator *string
+	var timmy *person = &person{
+		name: "Timmy",
+		age:  10,
+	}
 
-	scolese := "Christopher J. Scolese"
-	administrator = &scolese
-	fmt.Println(*administrator)
-	// 输出Christopher J. Scolese
+	// 虽然timmy是一个person类型的指针，按理应该是(*timmy).superpower = "flying"
+	// 但是go中有自动解引用的功能，所以下面这种写法等于上面的，即访问struct中的字段的时候，解引用不是必须的操作
+	timmy.superpower = "flying"
 
-	bolden := "Charles F. Bolden"
-	administrator = &bolden
-	fmt.Println(*administrator)
-	// 输出Charles F. Bolden
+	fmt.Printf("%+v\n", timmy)
 
-	bolden = "Charles Frank Bolden Jr."
-	fmt.Println(*administrator)
-	// 输出Charles Frank Bolden Jr.
+	// 指向数组的指针
+	var superpower *[3]string = &[3]string{"flight", "invisibility", "super strength"}
+	// 无需进行解引用，直接使用指针
+	fmt.Println(superpower[0])
+	fmt.Println(superpower[1:2])
 
-	*administrator = "Maj. Gen. Charles Frank Bolden Jr."
-	fmt.Println(bolden)
-	// 输出Maj. Gen. Charles Frank Bolden Jr.
+	// slice和map复合字面值也可以使用&操作，但是go并没有提供自动解引用的功能
 
-	major := administrator
-	*major = "Major General Charles Frank Bolden Jr."
-	fmt.Println(bolden)
-	// 输出Major General Charles Frank Bolden Jr.
-
-	// 如果两个指针类型的变量中存储的地址是一样的，它们的比较就是true
-	fmt.Println(administrator == major)
-	// 输出true
-
-	lightfoot := "Robert M. Lightfoot Jr."
-	administrator = &lightfoot
-	fmt.Println(administrator == major)
-	// 输出false
-
-	charles := *major
-	*major = "Charles Bolden"
-	fmt.Println(charles)
-	// 输出Major General Charles Frank Bolden Jr.
-	fmt.Println(bolden)
-	// 输出Charles Bolden
-
-	charles = "Charles Bolden"
-	fmt.Println(charles == bolden)
-	// 输出true
-	fmt.Println(&charles == &bolden)
-	// 输出false
 }
