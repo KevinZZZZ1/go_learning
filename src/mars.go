@@ -2,29 +2,34 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"time"
 )
 
 func main() {
-	// 通道(channel)可以用在多个goroutine之间安全的传值
-	// 通道可以作为变量，函数参数，结构体字段等
-	// 可以使用make函数来创建通道，并且要指定通道传输数据的类型
+	// 使用select来处理多个通道，如果不使用make函数初始化的话，通道变量的值就是nil
+	// 对nil通道发送和接收不会panic，但是会永久阻塞
+	// 对nil通道执行close函数，会引起panic
+	c := make(chan int)
 
-	// 发送操作的goroutine会等待，直到另一个goroutine尝试对该通道进行接收操作为止
-	// 执行接收操作的goroutine将等待直到另一个goroutine尝试向该通道进行发送操作为止
-	var c chan int = make(chan int)
 	for i := 0; i < 5; i++ {
 		go sleepyGopher(i, c)
 	}
 
+	timeout := time.After(2 * time.Second)
+
 	for i := 0; i < 5; i++ {
-		gopherId := <-c
-		fmt.Println("gopher ", gopherId, " has finished sleeping")
+		select {
+		case gopherId := <-c:
+			fmt.Println("gopher ", gopherId, " has finished sleeping")
+		case <-timeout:
+			fmt.Println("my patience ran out")
+			return
+		}
 	}
 }
 
 func sleepyGopher(id int, c chan int) {
-	time.Sleep(3 * time.Second)
-	fmt.Println("...", id, " snore ...")
+	time.Sleep(time.Duration(rand.Intn(4000)) * time.Millisecond)
 	c <- id
 }
