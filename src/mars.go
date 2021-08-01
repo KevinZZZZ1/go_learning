@@ -1,56 +1,26 @@
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
 
-type person struct {
-	name, superpower string
-	age              int
-}
-
-// 指针作为函数参数
-func birthday(p *person) {
-	p.age++
-}
-
-// 指针作为方法接收者
-func (p *person) birthday() {
-	p.age++
-}
-
-type stats struct {
-	level             int
-	endurance, health int
-}
-
-func levelUp(s *stats) {
-	s.level++
-	s.endurance = 42 + (14 * s.level)
-	s.health = 5 * s.endurance
-}
-
-type character struct {
-	name  string
-	stats stats
+func reclassify(planets *[]string) {
+	*planets = (*planets)[0:8]
 }
 
 func main() {
-	// go中函数和方法都是按值传递的，也就是说它们操作的是被传递参数的副本
-	var terry *person = &person{
-		name: "Terry",
-		age:  15,
+	// map在赋值或被作为参数传递给函数（方法）的时候不会被复制，而是以指针的形式传递
+
+	// slice在指向数组元素的时候也使用了指针
+	// 每个slice内部都会被表示为一个包括3个元素的结构：
+	// 	数组的指针
+	//	slice容量
+	// 	slice长度
+	// slice被直接传递给方法（函数）时，slice内部的指针就可以对底层的数组进行操作
+	planets := []string{
+		"Mercury", "Venus", "Earth", "Mars",
+		"Jupiter", "Saturn", "Uranus", "Neptune",
+		"Pluto",
 	}
 
-	terry.birthday()
-	fmt.Printf("%+v\n", terry)
-
-	birthday(terry)
-	fmt.Printf("%+v\n", terry)
-
-	player := character{name: "Matthias"}
-	// 获得结构体中指定字段的地址
-	levelUp(&player.stats)
-
-	fmt.Printf("%+v\n", player.stats)
+	reclassify(&planets)
+	fmt.Println(planets)
 }
