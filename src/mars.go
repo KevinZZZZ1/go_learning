@@ -1,35 +1,67 @@
 package main
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+)
 
 type location struct {
-	lat  float64
-	long float64
+	Name string
+	Lat  float64
+	Long float64
 }
 
 func main() {
 
-	var spririt location = location{
-		-4.5895,
-		-137.4417,
+	// 声明一个struct slice
+	var locations []location = []location{
+		{Name: "Bradbury Landing", Lat: -4.5895, Long: 175.4513541},
+		{Name: "Columbia Memorial Station", Lat: -14.4551, Long: 137.41654},
+		{Name: "Challenger Memorial Statition", Lat: -1.34265, Long: 354.454},
 	}
 
-	// 这里将struct类型进行赋值，会创建一个新的对象赋值给bradbury，所以在修改spririt的时候bradbury并不会被修改
-	bradbury := spririt
+	fmt.Println(locations)
 
-	spririt.long += 1
+	// struct格式化为json
+	var curiosity location = location{
+		Lat:  -4.2151,
+		Long: 137.4121,
+		Name: "ceeeeb",
+	}
 
-	fmt.Println(spririt, bradbury)
+	// 使用Marshal函数时要求struct中的字段都是大写开头的，即可以导出的
+	// 如果是不可以导出的，将会输出{}
+	bytes, err := json.Marshal(curiosity)
 
-	curiosity := bradbury
+	exitOnError(err)
 
-	addLong(bradbury)
+	fmt.Println(string(bytes))
 
-	fmt.Println(bradbury, curiosity)
+	// 如果想自定义json输出的字段key的话，可以使用struct标签来自定义
+	type people struct {
+		Name    string `json:"user_name"`
+		Age     int    `json:"user_age"`
+		Address string `json:"user_addr"`
+	}
+
+	var user people = people{
+		Name:    "kvein",
+		Age:     30,
+		Address: "USA",
+	}
+
+	bytes, err = json.Marshal(user)
+
+	exitOnError(err)
+
+	fmt.Println(string(bytes))
 
 }
 
-// 这里传入一个location类型的struct，这里的参数l也是函数实际传入参数的一个复制，即和传入参数是相互独立的
-func addLong(l location) {
-	l.long += 10
+func exitOnError(err error) {
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }
