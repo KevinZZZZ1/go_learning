@@ -1,32 +1,56 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type person struct {
 	name, superpower string
 	age              int
 }
 
-func main() {
-	// 复合字面量的前面可以使用&
+// 指针作为函数参数
+func birthday(p *person) {
+	p.age++
+}
 
-	var timmy *person = &person{
-		name: "Timmy",
-		age:  10,
+// 指针作为方法接收者
+func (p *person) birthday() {
+	p.age++
+}
+
+type stats struct {
+	level             int
+	endurance, health int
+}
+
+func levelUp(s *stats) {
+	s.level++
+	s.endurance = 42 + (14 * s.level)
+	s.health = 5 * s.endurance
+}
+
+type character struct {
+	name  string
+	stats stats
+}
+
+func main() {
+	// go中函数和方法都是按值传递的，也就是说它们操作的是被传递参数的副本
+	var terry *person = &person{
+		name: "Terry",
+		age:  15,
 	}
 
-	// 虽然timmy是一个person类型的指针，按理应该是(*timmy).superpower = "flying"
-	// 但是go中有自动解引用的功能，所以下面这种写法等于上面的，即访问struct中的字段的时候，解引用不是必须的操作
-	timmy.superpower = "flying"
+	terry.birthday()
+	fmt.Printf("%+v\n", terry)
 
-	fmt.Printf("%+v\n", timmy)
+	birthday(terry)
+	fmt.Printf("%+v\n", terry)
 
-	// 指向数组的指针
-	var superpower *[3]string = &[3]string{"flight", "invisibility", "super strength"}
-	// 无需进行解引用，直接使用指针
-	fmt.Println(superpower[0])
-	fmt.Println(superpower[1:2])
+	player := character{name: "Matthias"}
+	// 获得结构体中指定字段的地址
+	levelUp(&player.stats)
 
-	// slice和map复合字面值也可以使用&操作，但是go并没有提供自动解引用的功能
-
+	fmt.Printf("%+v\n", player.stats)
 }
