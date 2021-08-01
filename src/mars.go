@@ -2,37 +2,67 @@ package main
 
 import "fmt"
 
-type coordinate struct {
-	d, m, s float64
-	h       rune
+// type report struct {
+// 	sol       int
+// 	high, low float64
+// 	lat, long float64
+// }
+
+type sol int
+
+type celsius float64
+
+type temperature struct {
+	high, low celsius
 }
 
-// go中没有Java中的构造方法，但是可以用一个函数用来构造struct，这样就能让我们在创建struct的时候同步做些其他的事情
-func newCoordinate() coordinate {
-	return coordinate{}
+type location struct {
+	lat, long float64
+}
+
+// 这个struct就是组合上面三个类型和struct
+type report struct {
+	sol  sol
+	temp temperature
+	loc  location
+}
+
+func (t temperature) average() celsius {
+	return (t.high + t.low) / 2
 }
 
 func main() {
 
-	// go中没有class，对象，继承
-	// 我们可以通过struct和方法实现面向对象，即我们可以使用方法关联到类型的方式实现
+	// go可以使用struct实现组合，使用不同struct完成不同功能
+	bradbury := location{-4.5895, 137.4417}
+	t := temperature{high: -1.0, low: -78.0}
 
-	lat := coordinate{4, 35, 22.2, 'S'}
+	rep := report{
+		sol:  15,
+		temp: t,
+		loc:  bradbury,
+	}
 
-	long := coordinate{137, 26, 30.12, 'E'}
+	fmt.Printf("%+v", rep)
+	fmt.Println(rep.temp.average())
 
-	coor := newCoordinate()
+	// go也提供了嵌入(embedding)特性，可以实现方法的转发(forwarding)
+	// 这里的嵌入是指：在声明struct的时候只给定类型，不给定字段名
 
-	fmt.Println(lat.decimal(), long.decimal(), coor.decimal())
+	repEm := reportEmbedding{
+		sol:         15,
+		temperature: t,
+		location:    bradbury,
+	}
+
+	// 这里我们就能在repEm上直接调用本来在temperature上的方法，和fmt.Println(repEm.temperature.average())是一样的
+	fmt.Println(repEm.average())
 
 }
 
-func (c coordinate) decimal() float64 {
-	var sign float64 = 1
-	switch c.h {
-	case 'S', 's', 'E', 'e':
-		sign = -1
-	}
-
-	return sign * (c.d + c.m/60 + c.s/3600)
+// 声明struct嵌入
+type reportEmbedding struct {
+	sol sol
+	temperature
+	location
 }
