@@ -2,33 +2,34 @@ package main
 
 import "fmt"
 
+type location struct {
+	lat  float64
+	long float64
+}
+
 func main() {
 
-	// struct可以将多个不同类型的字段组合到一起
-
-	// 声明了一个变量curiosity，它的类型是struct
-	// 这种声明类似Java中的匿名类
-	var curiosity struct {
-		lat  float64
-		long float64
+	var spririt location = location{
+		-4.5895,
+		-137.4417,
 	}
 
-	curiosity.lat = -4.5895
-	curiosity.long = 137.4417
+	// 这里将struct类型进行赋值，会创建一个新的对象赋值给bradbury，所以在修改spririt的时候bradbury并不会被修改
+	bradbury := spririt
 
-	fmt.Println(curiosity.lat, curiosity.long)
-	fmt.Println(curiosity)
+	spririt.long += 1
 
-	// 这里是声明了一个location类型的struct，这样就能符用这个类型
-	type location struct {
-		lat  float64
-		long float64
-	}
+	fmt.Println(spririt, bradbury)
 
-	var spririt location
-	spririt.lat = -14.5684
-	spririt.long = 175.472636
+	curiosity := bradbury
 
-	fmt.Println(spririt)
+	addLong(bradbury)
 
+	fmt.Println(bradbury, curiosity)
+
+}
+
+// 这里传入一个location类型的struct，这里的参数l也是函数实际传入参数的一个复制，即和传入参数是相互独立的
+func addLong(l location) {
+	l.long += 10
 }
