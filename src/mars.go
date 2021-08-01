@@ -1,68 +1,49 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
-// type report struct {
-// 	sol       int
-// 	high, low float64
-// 	lat, long float64
-// }
-
-type sol int
-
-type celsius float64
-
-type temperature struct {
-	high, low celsius
+// 定义一个接口变量
+var t interface {
+	talk() string
 }
 
-type location struct {
-	lat, long float64
+type martian struct{}
+
+func (m martian) talk() string {
+	return "nack nack"
 }
 
-// 这个struct就是组合上面三个类型和struct
-type report struct {
-	sol  sol
-	temp temperature
-	loc  location
+type laser int
+
+func (l laser) talk() string {
+	return strings.Repeat("pew ", int(l))
 }
 
-func (t temperature) average() celsius {
-	return (t.high + t.low) / 2
+// 定义了一个接口类型
+type talker interface {
+	talk() string
+}
+
+func shout(t talker) {
+	louder := strings.ToUpper(t.talk())
+	fmt.Println(louder)
 }
 
 func main() {
 
-	// go可以使用struct实现组合，使用不同struct完成不同功能
-	bradbury := location{-4.5895, 137.4417}
-	t := temperature{high: -1.0, low: -78.0}
+	// 接口主要是定义了可以做什么，接口可以通过列举类型必须满足的一组方法来进行声明
+	// GO中不需要显式声明实现了什么接口
 
-	rep := report{
-		sol:  15,
-		temp: t,
-		loc:  bradbury,
-	}
+	t = martian{}
+	fmt.Println(t.talk())
 
-	fmt.Printf("%+v", rep)
-	fmt.Println(rep.temp.average())
+	t = laser(3)
+	fmt.Println(t.talk())
 
-	// go也提供了嵌入(embedding)特性，可以实现方法的转发(forwarding)
-	// 这里的嵌入是指：在声明struct的时候只给定类型，不给定字段名
+	shout(martian{})
+	shout(laser(5))
 
-	repEm := reportEmbedding{
-		sol:         15,
-		temperature: t,
-		location:    bradbury,
-	}
-
-	// 这里我们就能在repEm上直接调用本来在temperature上的方法，和fmt.Println(repEm.temperature.average())是一样的
-	fmt.Println(repEm.average())
-
-}
-
-// 声明struct嵌入
-type reportEmbedding struct {
-	sol sol
-	temperature
-	location
 }
