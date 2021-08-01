@@ -6,20 +6,25 @@ import (
 )
 
 func main() {
+	// 通道(channel)可以用在多个goroutine之间安全的传值
+	// 通道可以作为变量，函数参数，结构体字段等
+	// 可以使用make函数来创建通道，并且要指定通道传输数据的类型
 
-	// go中的独立认为叫做goroutine，类似于Java中的线程
-	// goroutine的创建效率非常高
-
-	// 在任何方法和函数调用之前使用go关键字就能启动goroutine
-	// 向goroutine创建参数和向函数传递参数一样，参数都是按值传递的
+	// 发送操作的goroutine会等待，直到另一个goroutine尝试对该通道进行接收操作为止
+	// 执行接收操作的goroutine将等待直到另一个goroutine尝试向该通道进行发送操作为止
+	var c chan int = make(chan int)
 	for i := 0; i < 5; i++ {
-		go sleepyGopher(i)
+		go sleepyGopher(i, c)
 	}
 
-	time.Sleep(4 * time.Second)
+	for i := 0; i < 5; i++ {
+		gopherId := <-c
+		fmt.Println("gopher ", gopherId, " has finished sleeping")
+	}
 }
 
-func sleepyGopher(id int) {
+func sleepyGopher(id int, c chan int) {
 	time.Sleep(3 * time.Second)
-	fmt.Println("...snore...", id)
+	fmt.Println("...", id, " snore ...")
+	c <- id
 }
