@@ -2,34 +2,57 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
-	"time"
+	"strings"
 )
 
-func main() {
-	// 使用select来处理多个通道，如果不使用make函数初始化的话，通道变量的值就是nil
-	// 对nil通道发送和接收不会panic，但是会永久阻塞
-	// 对nil通道执行close函数，会引起panic
-	c := make(chan int)
-
-	for i := 0; i < 5; i++ {
-		go sleepyGopher(i, c)
+func sourceGopher(downstream chan string) {
+	for _, v := range []string{"hello world", "a bad apple", "goodbye all"} {
+		downstream <- v
 	}
 
-	timeout := time.After(2 * time.Second)
+	close(downstream)
+}
 
-	for i := 0; i < 5; i++ {
-		select {
-		case gopherId := <-c:
-			fmt.Println("gopher ", gopherId, " has finished sleeping")
-		case <-timeout:
-			fmt.Println("my patience ran out")
+func filterGopher(upstream, downstream chan string) {
+	for {
+		item, ok := <-upstream
+		if !ok {
+			close(downstream)
 			return
+		}
+
+		if !strings.Contains(item, "bad") {
+			downstream <- item
 		}
 	}
 }
 
-func sleepyGopher(id int, c chan int) {
-	time.Sleep(time.Duration(rand.Intn(4000)) * time.Millisecond)
-	c <- id
+func filterGopher2(upstream, downstream chan string) {
+	for item := range upstream {
+		if !strings.Contains(item, "bad") {
+			downstream <- item
+		}
+	}
+
+	close(downstream)
+}
+
+func printGopher(upstream chan string) {
+	for {
+		item, ok := <-upstream
+
+		if !ok {
+			return
+		}
+		fmt.Println(item)
+	}
+}
+
+func main() {
+	c0 := make(chan string)
+	c1 := make(chan string)
+
+	go sourceGopher(c0)
+	go filterGopher(c0, c1)
+	printGopher(c1)
 }
